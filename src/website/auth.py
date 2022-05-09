@@ -5,7 +5,7 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
 def login():
-    return "<p>Login page placeholder</p>"
+    return render_template("login.html")
 
 
 @auth.route('/logout')
