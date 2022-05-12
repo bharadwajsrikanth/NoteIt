@@ -2,6 +2,14 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask import flash
+from flask import redirect
+from flask import url_for
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+
+from . import db
+from .models import User
+
 
 auth = Blueprint('auth', __name__)
 
@@ -33,7 +41,12 @@ def register():
         elif len(password1) < 7:
             flash('Password must be greater than 7 character.', category='error')
         else:
-            '''Add user to DB'''
+            new_user = User(email=email,
+                            first_name=first_name,
+                            password=generate_password_hash(password1, method='sha256'))
+            db.session.add(new_user)
+            db.session.commit()
             flash('Account successfully created.', category='success')
+            return redirect(url_for('views.home'))
 
     return render_template("register.html")
