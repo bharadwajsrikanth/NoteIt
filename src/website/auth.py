@@ -4,6 +4,11 @@ from flask import request
 from flask import flash
 from flask import redirect
 from flask import url_for
+from flask_login import login_user
+from flask_login import login_required
+from flask_login import logout_user
+from flask_login import current_user
+
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -28,13 +33,16 @@ def login():
                 flash('Incorrect password, try again.', category='error')
             else:
                 flash('Logged in successfully.', category='success')
+                login_user(user, remember=True)
                 return redirect(url_for('views.home'))
-    return render_template("login.html")
+    return render_template("login.html", user=current_user)
 
 
 @auth.route('/logout')
+@login_required
 def logout():
-    return "<p>Logout page placeholder</p>"
+    logout_user()
+    return redirect(url_for('auth.login'))
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -62,7 +70,8 @@ def register():
                             password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
+            login_user(user, remember=True)
             flash('Account successfully created.', category='success')
             return redirect(url_for('views.home'))
 
-    return render_template("register.html")
+    return render_template("register.html", user=current_user)
