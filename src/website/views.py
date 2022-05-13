@@ -1,7 +1,12 @@
 from flask import Blueprint
+from flask import render_template
+from flask_login import login_required
+from flask_login import current_user
 
 views = Blueprint('views', __name__)
 
+
 @views.route('/')
+@login_required
 def home():
-    return "<h1>Home page placeholder</h1>"
+    return render_template("home.html", user=current_user)
